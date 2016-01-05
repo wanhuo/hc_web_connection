@@ -1,0 +1,21 @@
+.product-list{
+
+	margin-top: 10px
+}
+
+.img-responsive{
+
+	border: 1px solid #e5e5e5;
+}
+
+.col{
+
+	width: 39%;
+	float: left;
+	margin: 5% 2% 0 7%;
+}
+
+.title{
+
+	margin: 5px 0;
+}
