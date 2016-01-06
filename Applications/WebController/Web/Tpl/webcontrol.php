@@ -23,6 +23,7 @@ $param = explode('/', $result['param']);
   <link rel="stylesheet" href="css/buttons.css">
   <link rel="stylesheet" href="css/messenger.css">
   <link rel="stylesheet" href="css/messenger-theme-block.css">
+  <link rel="stylesheet" href="css/hcweb.css">
 </head>
 <body>
 <!-- 主页模态框开始 -->
@@ -74,16 +75,20 @@ $param = explode('/', $result['param']);
 </div>
 <!-- 帮助模态框结束 -->
 <div class="container-fluid" style="margin-bottom: 50px;">
+  <div class="col-md-8 col-md-offset-2" style="padding-left: 0px; padding-right: 0px;">
   <?php  for($i=0; $i<30; $i++){?>
-  	<div class="col-xs-4 col-sm-4 col-md-4" style="margin: 10px 0; text-align: center; padding: 0px;">
-  	<button class="button button-raised button-primary button-pill" style="max-width: 250px; width: 95%; padding: 0px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="<?php echo $i+1?>"><?php echo $param[$i]?></button>
+  	<div class="col-xs-4 col-sm-4 col-md-4 hcbtnbox">
+  	<button class="button button-raised button-primary button-pill" id="<?php echo $i+1?>"><?php echo $param[$i]?></button>
   	</div>
   <?php  }  ?>
 </div>
-<div style="height: 50px; width: 100%; background-color: rgba(245, 245, 245, 0.95); color: #0888e6; z-index: 999px; position:fixed; bottom: 0px;">
-  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-shopping-cart" id="home" style="font-size: 30px;"></span></div>
-  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-user" id="info" style="font-size: 30px;"></span></div>
-  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-question-sign" id="question" style="font-size: 30px;"></span></div>
+</div>
+<div class="hcbottombox">
+  <div class="col-md-8 col-md-offset-2">
+  <div class="col-xs-4 col-sm-4 col-md-4 hcbottomtag"><span class="glyphicon glyphicon-shopping-cart" id="home"></span></div>
+  <div class="col-xs-4 col-sm-4 col-md-4 hcbottomtag"><span class="glyphicon glyphicon-user" id="info"></span></div>
+  <div class="col-xs-4 col-sm-4 col-md-4 hcbottomtag"><span class="glyphicon glyphicon-question-sign" id="question"></span></div>
+  </div>
 </div>
 </body>
 <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>

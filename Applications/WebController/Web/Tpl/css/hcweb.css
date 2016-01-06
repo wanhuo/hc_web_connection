@@ -1,0 +1,45 @@
+/*按键列表开始*/
+.hcbtn {
+	height: 5em;
+	font-size: 12px;
+	width: 100%;
+}
+.hcbtnbox {
+	margin: 10px 0;
+	padding: 0px;
+	text-align: center
+}
+
+.hcbtnbox button {
+	width: 95%;
+	max-width: 250px;
+	padding: 0px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space:nowrap;
+}
+/*按键列表结束*/
+/*底部标签开始*/
+.hcbottombox {
+	
+	position:fixed;
+	bottom: 0px;
+	height: 50px;
+	width: 100%;
+	background-color: rgba(245, 245, 245, 0.95);
+	color: #0888e6;
+	z-index: 999px
+
+}
+
+.hcbottomtag {
+	height: 100%;
+	line-height: 50px;
+	text-align: center;
+	padding-top: 10px
+}
+
+.hcbottomtag span {
+	font-size: 25px
+}
+/*底部标签结束
