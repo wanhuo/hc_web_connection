@@ -83,8 +83,8 @@ $param = explode('/', $result['param']);
   <?php  }  ?>
 </div>
 <div style="height: 50px; width: 100%; background-color: rgba(245, 245, 245, 0.95); color: #0888e6; z-index: 999px; position:fixed; bottom: 0px;">
-  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-home" id="home" style="font-size: 30px;"></span></div>
-  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-info-sign" id="info" style="font-size: 30px;"></span></div>
+  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-shopping-cart" id="home" style="font-size: 30px;"></span></div>
+  <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-user" id="info" style="font-size: 30px;"></span></div>
   <div class="col-xs-4 col-sm-4 col-md-4" style="height: 100%; line-height: 50px; text-align: center; padding: 0px; padding-top: 10px;"><span class="glyphicon glyphicon-question-sign" id="question" style="font-size: 30px;"></span></div>
 </div>
 </body>
@@ -98,7 +98,7 @@ $param = explode('/', $result['param']);
     var macid = "<?php echo $macid ?>";
     // 初始化弹出框
     Messenger.options = {
-    extraClasses: 'messenger-fixed messenger-on-top',
+    extraClasses: 'messenger-fixed messenger-on-bottom',
     theme: 'block'
     }
 
