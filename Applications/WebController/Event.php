@@ -2,8 +2,6 @@
 use \GatewayWorker\Lib\Gateway;
 use \GatewayWorker\Lib\Db;
 use \GatewayWorker\Lib\Store;
-// require_once 'Web/transToWxServer.php';
-require_once 'Web/redisData.php';
 
 /**
  * 主逻辑
@@ -44,6 +42,15 @@ class Event
     	$redis = new Redis();
         $redis->connect('127.0.0.1', '6379');
         return $redis;
+    }
+    /**
+     * 判断MACID是否合法
+     * @param  string  $mecid
+     * @return boolean
+     */
+    private static function isMacId($mecid){
+    	$macpreg = "/^[a-zA-Z0-9]{16}$/";
+    	return preg_match($macpreg, $mecid);
     }
 	/**
 	 * 客户端连接
@@ -116,23 +123,32 @@ class Event
 	 */
    public static function onMessage($client_id, $message)
    {
-   			/**
-      		 * 得到客户端的IP和端口号
-      		 * var_dump($_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT']);
-      		 */
+   		/**
+      	* 得到客户端的IP和端口号
+      	* var_dump($_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT']);
+      	*/
+
+ 		// 数据库实例
  		$connectHC = Db::instance('ConnectHC');
-      	// 没有登录
-      	if(null === self::$redisConnection->get($client_id)){
-      		// 接收到的是JSON数据包
-      		if(is_array($message)){
+
+ 		// 接收到心跳包
+ 		if(!is_array($message))
+ 		{
+ 			// 回复心跳包
+      		Gateway::sendToCurrentClient(1);
+ 		}
+ 		// 判断是否登录过
+      	else if(null === self::$redisConnection->get($client_id)){
+      		// macid是有效id
+      		if(self::isMacId($message['macid'])){
       			self::connectionMacId($client_id, $message['macid']);
       			return;
       		}
-      		// 回复心跳包
-      		Gateway::sendToCurrentClient(1);
-		}else{
+      		Gateway::sendToCurrentClient('fail');
+		}
+		else
+		{
 			Gateway::sendToCurrentClient(1);
-			if(is_array($message)){
 				// 更新蓝牙连接标志
 				if(isset($message['sign'])){
 					$sign = $message['sign'];
@@ -141,7 +157,7 @@ class Event
 					return;
 				}
 				// 更新CLIENTID
-				if(isset($message['macid'])){
+				if(isset($message['macid']) && self::isMacId($message['macid'])){
 					self::connectionMacId($client_id, $message['macid']);
 					return;
 				}
@@ -153,10 +169,6 @@ class Event
 				}
 				$paramafter = implode('/', $parambefore);
 				$connectHC->query("UPDATE `WEBHC` SET `param` = '$paramafter' WHERE clientid=$client_id");
-			}else{
-				// 回复心跳包
-				Gateway::sendToCurrentClient(1);
-			}
 
 		}
     }
@@ -171,8 +183,8 @@ class Event
    {
        
        $connectHC = Db::instance('ConnectHC');
-       // clientid清0
-       $connectHC->query("UPDATE `WEBHC` SET `clientid` = 0, `sign`= 0 WHERE clientid='$client_id'");
+       // 清除记录
+       $connectHC->query("DELETE FROM 'WEBHC' WHERE clientid='$client_id'");
        self::$redisConnection->del($client_id);
    }
 

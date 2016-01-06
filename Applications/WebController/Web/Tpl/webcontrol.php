@@ -20,9 +20,7 @@ $param = explode('/', $result['param']);
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title></title>
   <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/buttons.css">
-  <link rel="stylesheet" href="css/intell.css">
   <link rel="stylesheet" href="css/messenger.css">
   <link rel="stylesheet" href="css/messenger-theme-block.css">
 </head>
