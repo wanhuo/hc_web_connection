@@ -19,11 +19,10 @@ namespace GatewayWorker\Lib;
 class Db
 {
     /**
-     * 实例数组
+     * MYSQL实例数组
      * @var array
      */
-    protected static $instance = array();
-    
+    protected static $instance = array();    
     /**
      * 获取实例
      * @param string $config_name

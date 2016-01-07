@@ -13,7 +13,7 @@ $macid = $_POST['macid'];
 $buttonid = $_POST['buttonid'];
 $connectHC = Db::instance('ConnectHC');
 $clientdata = $connectHC->row("SELECT clientid, sign FROM `WEBHC` WHERE macid='$macid'");
-if(!Gateway::isOnline($clientdata['clientid'])){
+if(!$clientdata || !Gateway::isOnline($clientdata['clientid'])){
 	echo "102";
 	HTTP::end();
 }

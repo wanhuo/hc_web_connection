@@ -38,6 +38,7 @@ $gateway->pingInterval = 60;
 $gateway->pingNotResponseLimit = 2;
 // 心跳数据
 $gateway->pingData = '';
+$gateway->registerAddress = '127.0.0.1:1236';
 
 /* 
 // 当客户端连接上来时，设置连接的onWebSocketConnect，即在websocket握手时的回调

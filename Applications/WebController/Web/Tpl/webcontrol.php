@@ -8,6 +8,7 @@ if(!isset($_GET['macid'])){
 	echo "对不起，你访问的页面不存在！";
 	HTTP::end();
 }
+// error_reporting(0);
 $macid = $_GET['macid'];
 $connectHC = Db::instance('ConnectHC');
 $result = $connectHC->row("SELECT param FROM `WEBHC` WHERE macid='$macid'");

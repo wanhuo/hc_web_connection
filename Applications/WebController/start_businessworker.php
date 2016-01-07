@@ -28,6 +28,7 @@ $worker = new BusinessWorker();
 $worker->name = 'HCWorkerman';
 // bussinessWorker进程数量
 $worker->count = 1;
+$worker->registerAddress = '127.0.0.1:1236';
 
 
 // 如果不是在根目录启动，则运行runAll方法
