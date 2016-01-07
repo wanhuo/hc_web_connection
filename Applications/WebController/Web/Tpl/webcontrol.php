@@ -78,7 +78,7 @@ $param = explode('/', $result['param']);
   <div class="col-md-8 col-md-offset-2" style="padding-left: 0px; padding-right: 0px;">
   <?php  for($i=0; $i<30; $i++){?>
   	<div class="col-xs-4 col-sm-4 col-md-4 hcbtnbox">
-  	<button class="button button-raised button-primary button-pill" id="<?php echo $i+1?>"><?php echo $param[$i]?></button>
+  	<button class="hcbtn" id="<?php echo $i+1?>"><?php echo $param[$i]?></button>
   	</div>
   <?php  }  ?>
 </div>
@@ -135,7 +135,9 @@ $param = explode('/', $result['param']);
       window.location.href="https://hc-com.taobao.com";
     });
 
-    $("button.button-primary").click(function(){
+    $(".hcbtn").click(function(){
+      var ele = $(this)[0];
+      ele.className = "hcbtnactive";
       var buttonid = $(this).attr("id");
       // AJAX异步发送
       $.ajax({
@@ -144,6 +146,7 @@ $param = explode('/', $result['param']);
         data: {'macid' : macid, 'buttonid' : buttonid},
         success: function(data){
           if(data == "101"){
+            ele.className = "hcbtn";
             Messenger().post({
               message: "发送成功！",
               type: "success",
@@ -153,6 +156,7 @@ $param = explode('/', $result['param']);
             return;
           }
           if(data == "102"){
+            ele.className = "hcbtn";
             Messenger().post({
               message: "设备与服务器断开，请稍后重试！",
               type: "error",
@@ -162,6 +166,7 @@ $param = explode('/', $result['param']);
             return;
           }
           if(data == "103"){
+            ele.className = "hcbtn";
             Messenger().post({
               message: "设备与红外蓝牙断开，请稍后重试！",
               type: "error",
@@ -173,8 +178,9 @@ $param = explode('/', $result['param']);
 
         },
         error: function(data){
+          ele.className = "hcbtn";
           Messenger().post({
-            message: "发送超时，请稍后重试！",
+            message: "网络错误或网络故障，请稍后重试！",
             type: "error",
             hideAfter: 2,
             hideOnNavigate: true,     
