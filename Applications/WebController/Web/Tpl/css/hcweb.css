@@ -15,6 +15,9 @@
     background: -ms-linear-gradient(top,  #0888E6 0%,#4FABEF 100%);
     background: linear-gradient(to bottom,  #0888E6 5%,#269CF3 50%, #0888E6 80%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0888E6', endColorstr='#4FABEF',GradientType=0 );
+    /*禁止用户浏览器选择功能*/
+    -webkit-user-select: none;
+	-moz-user-select: none;
 }
 
 .hcbtn:active,

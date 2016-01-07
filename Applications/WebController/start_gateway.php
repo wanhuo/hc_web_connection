@@ -21,7 +21,7 @@ use \Workerman\Autoloader;
 require_once __DIR__ . '/../../Workerman/Autoloader.php';
 Autoloader::setRootPath(__DIR__);
 
-// gateway 进程，这里使用Text协议，可以用telnet测试
+// gateway 进程
 $gateway = new Gateway("Json://0.0.0.0:3303");
 // gateway名称，status方便查看
 $gateway->name = 'HCGateway';

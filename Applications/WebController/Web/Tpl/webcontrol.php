@@ -99,6 +99,7 @@ $param = explode('/', $result['param']);
   $(function(){
 
     var macid = "<?php echo $macid ?>";
+    var w = window;
     // 初始化弹出框
     Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-bottom',
@@ -132,9 +133,8 @@ $param = explode('/', $result['param']);
 
     $("button[name='islocation']").click(function(){
 
-      window.location.href="https://hc-com.taobao.com";
+      w.location.href="https://hc-com.taobao.com";
     });
-
     $(".hcbtn").click(function(){
       var ele = $(this)[0];
       ele.className = "hcbtnactive";
