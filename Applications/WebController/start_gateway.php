@@ -40,6 +40,13 @@ $gateway->pingNotResponseLimit = 2;
 $gateway->pingData = '';
 $gateway->registerAddress = '127.0.0.1:1236';
 
+$hcwebsocket = new Gateway("Websocket://0.0.0.0:4404");
+$hcwebsocket->name = 'HCWebsocket';
+$hcwebsocket->count = 1;
+$hcwebsocket->IanIp = '127.0.0.1';
+$hcwebsocket->startPort = 2500;
+$hcwebsocket->registerAddress = "127.0.0.1:1236";
+
 /* 
 // 当客户端连接上来时，设置连接的onWebSocketConnect，即在websocket握手时的回调
 $gateway->onConnect = function($connection)

@@ -96,8 +96,25 @@ $param = explode('/', $result['param']);
 <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="js/messenger.min.js"></script>
 <script src="js/messenger-theme-future.js"></script>
+<script src="js/swfobject.js"></script>
+<script src="js/web_socket.js"></script>
 <script>
   $(function(){
+
+    WEB_SOCKET_SWF_LOCATION = "js/WebSocketMain.swf";
+    var ws = new WebSocket("ws://120.25.148.172:4404/");
+    ws.onopen = function() {
+      ws.send("Hello");  // Sends a message.
+    };
+    ws.onmessage = function(e) {
+
+      alert(e.data);
+    };
+    ws.onclose = function() {
+
+      alert("closed");
+    };
+
 
     var macid = "<?php echo $macid ?>";
     var w = window;

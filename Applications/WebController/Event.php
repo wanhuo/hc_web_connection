@@ -123,12 +123,20 @@ class Event
 	 */
    public static function onMessage($client_id, $message)
    {
+   		if($_SERVER['GATEWAY_PORT'] === 4404)
+   		{
+   			var_dump($client_id);
+   			Gateway::sendToCurrentClient($message);
+   			return;
+   		}
    		/**
       	* 得到客户端的IP和端口号
       	* var_dump($_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT']);
       	*/
 
+ 		// var_dump($client_id);
  		// 数据库实例
+ 		var_dump($client_id);
  		$connectHC = Db::instance('ConnectHC');
 
  		// 接收到心跳包
