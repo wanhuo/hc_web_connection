@@ -16,7 +16,7 @@ class Db
 		'host'		 => '127.0.0.1',
 		'port'		 => 3306,
 		'user'		 => 'root',
-		'password'	 => 'qwe123',
+		'password'	 => 'a8508212',
 		'dbname'	 => 'HC',
 		'charset'	 => 'utf8',
 

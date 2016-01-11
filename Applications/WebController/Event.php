@@ -109,6 +109,7 @@ class Event
 	 */
     public static function onConnect($client_id)
     {       
+    	var_dump($client_id);
     	if(!isset(self::$redisConnection))
     	{
     		self::$redisConnection = self::connectRedis();
@@ -134,9 +135,7 @@ class Event
       	* var_dump($_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT']);
       	*/
 
- 		// var_dump($client_id);
  		// 数据库实例
- 		var_dump($client_id);
  		$connectHC = Db::instance('ConnectHC');
 
  		// 接收到心跳包
@@ -190,10 +189,16 @@ class Event
    public static function onClose($client_id)
    {
        
-       $connectHC = Db::instance('ConnectHC');
-       // 清除记录
-       $connectHC->query("DELETE FROM `WEBHC` WHERE clientid='$client_id'");
-       self::$redisConnection->del($client_id);
+    	// websocket客户端断开连接
+       	if($_SERVER['GATEWAY_PORT'] === 4404)
+   		{
+   			var_dump($client_id."unconnection");
+   			return;
+   		}
+       	$connectHC = Db::instance('ConnectHC');
+       	// 清除记录
+       	$connectHC->query("DELETE FROM `WEBHC` WHERE clientid='$client_id'");
+       	self::$redisConnection->del($client_id);
    }
 
 }

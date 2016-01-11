@@ -66,7 +66,7 @@ $gateway->onConnect = function($connection)
 */
 
 $webserver = new WebServer('http://0.0.0.0:80');
-$webserver->addRoot('120.25.148.172','/hc_web_connection/Applications/WebController/Web');
+$webserver->addRoot('112.74.74.150','/HC-23/hc_web_connection/Applications/WebController/Web');
 $webserver->count = 1;
 // 如果不是在根目录启动，则运行runAll方法
 if(!defined('GLOBAL_START'))

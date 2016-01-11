@@ -102,13 +102,23 @@ $param = explode('/', $result['param']);
   $(function(){
 
     WEB_SOCKET_SWF_LOCATION = "js/WebSocketMain.swf";
-    var ws = new WebSocket("ws://120.25.148.172:4404/");
+    var ws = new WebSocket("ws://112.74.74.150:4404/");
     ws.onopen = function() {
-      ws.send("Hello");  // Sends a message.
+      // ws.send("Hello");  // Sends a message.
     };
     ws.onmessage = function(e) {
 
-      alert(e.data);
+      var dc = document;
+      var id = e.data;
+      var ele = dc.getElementById(id);
+      ele.className = "hcbtn";
+      Messenger().post({
+        message: "发送成功！",
+        type: "success",
+        hideAfter: 1,
+        hideOnNavigate: true,
+      });
+      return;
     };
     ws.onclose = function() {
 
@@ -157,54 +167,7 @@ $param = explode('/', $result['param']);
       var ele = $(this)[0];
       ele.className = "hcbtnactive";
       var buttonid = $(this).attr("id");
-      // AJAX异步发送
-      $.ajax({
-        url: "webcontrol_admin.php",
-        type: "POST",
-        data: {'macid' : macid, 'buttonid' : buttonid},
-        success: function(data){
-          if(data == "101"){
-            ele.className = "hcbtn";
-            Messenger().post({
-              message: "发送成功！",
-              type: "success",
-              hideAfter: 1,
-              hideOnNavigate: true,
-            });
-            return;
-          }
-          if(data == "102"){
-            ele.className = "hcbtn";
-            Messenger().post({
-              message: "设备与服务器断开，请稍后重试！",
-              type: "error",
-              hideAfter: 1,
-              hideOnNavigate: true,      
-            });
-            return;
-          }
-          if(data == "103"){
-            ele.className = "hcbtn";
-            Messenger().post({
-              message: "设备与红外蓝牙断开，请稍后重试！",
-              type: "error",
-              hideAfter: 1,
-              hideOnNavigate: true,      
-            });
-            return;
-          }
-
-        },
-        error: function(data){
-          ele.className = "hcbtn";
-          Messenger().post({
-            message: "网络错误或网络故障，请稍后重试！",
-            type: "error",
-            hideAfter: 2,
-            hideOnNavigate: true,     
-          });
-        }
-      })
+      ws.send(buttonid);
     });
   })
 </script>
