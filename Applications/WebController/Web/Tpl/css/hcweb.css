@@ -74,6 +74,15 @@
 	padding-top: 10px
 }
 
+.hcconnection {
+	color: rgb(13, 187, 83); 
+	text-shadow: rgb(0, 255, 0) 0px 0px 10px
+}
+
+.hcbreak {
+	color: #C3C3C3;
+}
+
 .hcbottomtag span {
 	font-size: 25px
 }

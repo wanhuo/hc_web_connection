@@ -11,8 +11,8 @@ if(!isset($_GET['macid'])){
 // error_reporting(0);
 $macid = $_GET['macid'];
 $connectHC = Db::instance('ConnectHC');
-$result = $connectHC->row("SELECT param FROM `WEBHC` WHERE macid='$macid'");
-$param = explode('/', $result['param']);
+$result = $connectHC->single("SELECT param FROM `WEBHC` WHERE macid='$macid'");
+$param = explode('],[', substr(substr($result, 1), 0, -1));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,28 +101,83 @@ $param = explode('/', $result['param']);
 <script>
   $(function(){
 
+    var intelsign = false;
     WEB_SOCKET_SWF_LOCATION = "js/WebSocketMain.swf";
     var ws = new WebSocket("ws://112.74.74.150:4404/");
+    
+    // websocket握手事件
     ws.onopen = function() {
-      // ws.send("Hello");  // Sends a message.
+      intelsign = true;
     };
+
+    // websocket接收数据事件
     ws.onmessage = function(e) {
 
+      var data = Array();
       var dc = document;
-      var id = e.data;
-      var ele = dc.getElementById(id);
+      var a = e.data.substring(1, e.data.indexOf('}'));
+      var result = a.split(',');
+      for(var d in result)
+      {
+        var c = result[d].split(':');
+        data[c[0]] = c[1];
+      }
+      var ele = dc.getElementById(data['ButtonId']);
+      var content = data['Content'];
       ele.className = "hcbtn";
+      switch(content)
+      {
+        case '001':
+          Messenger().post({
+            message: "发送成功！",
+            type: "success",
+            hideAfter: 1,
+            hideOnNavigate: true,
+          });
+          break;
+
+        case '101':
+          Messenger().post({
+            message: "设备与服务器断开，请稍后重试！",
+            type: "error",
+            hideAfter: 1,
+            hideOnNavigate: true,      
+          });
+          break;
+
+        case '102':
+          Messenger().post({
+            message: "设备与红外蓝牙断开，请稍后重试！",
+            type: "error",
+            hideAfter: 1,
+            hideOnNavigate: true,      
+          });
+          break;
+
+        default:
+          Messenger().post({
+            message: "发送超时，请稍后重试！",
+            type: "error",
+            hideAfter: 1,
+            hideOnNavigate: true,     
+          });
+          break;
+      }
+    };
+
+    // websoket断开事件
+    ws.onclose = function() {
+      if(!intelsign)
+      {
+        return;
+      }
+      intelsign = false;
       Messenger().post({
-        message: "发送成功！",
-        type: "success",
+        message: "与服务器连接断开，请刷新页面重试！",
+        type: "error",
         hideAfter: 1,
         hideOnNavigate: true,
       });
-      return;
-    };
-    ws.onclose = function() {
-
-      alert("closed");
     };
 
 
@@ -134,8 +189,10 @@ $param = explode('/', $result['param']);
     theme: 'block'
     }
 
+    // 菜单栏按下
     $("span").on("touchstart touchend click", function(){
 
+      var dc = document;
       var eventype = event.type;
       var elementid = $(this).attr("id");
       if(eventype == "touchstart"){
@@ -155,19 +212,37 @@ $param = explode('/', $result['param']);
           case "question":
             $('#questionModal').modal('show');
           break;
+
+          default:
+            break;
         }
       }
     });
 
+    // 跳转淘宝主页
     $("button[name='islocation']").click(function(){
 
       w.location.href="https://hc-com.taobao.com";
     });
+
+    // 用户操作按键
     $(".hcbtn").click(function(){
+      if(!intelsign)
+      {
+        Messenger().post({
+        message: "与服务器连接断开，请刷新页面重试！",
+        type: "error",
+        hideAfter: 1,
+        hideOnNavigate: true,
+        });
+        return;
+      }
       var ele = $(this)[0];
       ele.className = "hcbtnactive";
       var buttonid = $(this).attr("id");
-      ws.send(buttonid);
+      var transpacket = '{"MsgType": "Trans", "MacId": "' + macid + '", "Content": ' + buttonid + '}';
+      // websocket发送
+      ws.send(transpacket);
     });
   })
 </script>

@@ -1,34 +1,85 @@
-这是汇承红外模块服务器
+# 这是汇承红外模块服务器
 
 数据库：MYSQL
+
 缓存：REDIS
+
 MACID: 为12位固定id+4位随机数
+
 CLIENTID: 为固定20字符
 
-数据与APP传输协议
+## websocket与服务器传输协议
 
-注册macid
+### 按下按键(websocket→服务器)
+
+{'MsgType': 'Trans', 'MacId': '', 'Content': ''}
+
+### 传输结果(服务器→websocket)
+
+{'MsgType': 'Trans', 'ButtonId': '', 'Content': ''}
+
+
+
+## APP与服务器传输协议
+
+
+### 注册macid(APP→服务器)
 
 {'MsgType': 'Register', 'Content': ''}
 
-心跳包
+eg: {'MsgType': 'Register', 'Content': '1234567890654321'}
 
-{'MsgType': 'HearPacket', 'Content': ''}
 
-更新蓝牙标志
+### 心跳包(APP→服务器)
 
-{'MsgType': 'BuleSign', 'Content': ''}
+{'MsgType': 'HeartPacket', 'Content': ''}
 
-更新按键名称
+eg: {'MsgType': 'HeartPacket', 'Content': 1}
 
-{'MsgType': 'Button', 'Content': ''}
 
-数据传输
+### 蓝牙标志(APP→服务器)
+
+{'MsgType': 'BlueSign', 'Content': ''}
+
+eg: {'MsgType': 'BlueSign', 'Content': 1}
+
+
+### 初始化按键(APP→服务器)
+
+{'MsgType': 'iniButton', 'Content': ''}
+
+eg: {'MsgType': 'iniButton', 'Content': '[1],[2],[3],[4],...'}
+
+### 更新按键名称(APP→服务器)
+
+{'MsgType': 'altButton', 'Content': ''}
+
+eg: {'MsgType': 'Button', 'Content': '2/关'}
+
+
+### 数据传输(服务器→APP)
 
 {'MsgType': 'Trans', 'ClientId': '', 'Content': ''}
 
-数据传输成功(检测APP和服务器是否连接、检测蓝牙是否连接)
+eg: {'MsgType': 'Trans', 'ClientId': '1234567890123456', 'Content': 2}
 
-{'MsgType': 'Trans', 'ClientId': '', 'Content': 001}
 
-APP与服务器断开连接
+### 数据传输成功(APP→服务器)
+
+{'MsgType': 'Trans', 'ClientId': '', 'ButtonId': '', 'Content': '001'}
+
+eg: {'MsgType': 'Trans', 'ClientId': '1234567890123456', 'ButtonId': 2, 'Content': '001'}
+
+
+### APP与服务器断开连接(APP→服务器)
+
+{'MsgType': 'Trans', 'ClientId': '', 'ButtonId': '', 'Content': '101'}
+
+eg: {'MsgType': 'Trans', 'ClientId': '1234567890123456', 'ButtonId': 2, 'Content': '101'}
+
+
+### APP与蓝牙设备断开连接(APP→服务器)
+
+{'MsgType': 'Trans', 'ClientId': '', 'ButtonId': '', 'Content': '102'}
+
+eg: {'MsgType': 'Trans', 'ClientId': '1234567890123456', 'ButtonId': 2, 'Content': '102'}

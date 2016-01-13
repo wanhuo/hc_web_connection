@@ -26,14 +26,28 @@ class Event
      * 客户端连接成功
      * @var sting
      */
-    const SUCCESS_CONNECTION = "success";
+    const SUCCESS_CONNECTION = '{"MsgType": "Register", "Content": "Success"}';
     /**
      * 修改蓝牙标志成功
      * @var sting
      */
-    const SUCCESS_SET_SIGN = "sign success";
-
-	/**
+    const SUCCESS_SET_SIGN = '{"MsgType": "BlueSign", "Content": "SignSuccess"}';
+    /**
+     * 初始化按键成功
+     * @var string
+     */
+    const SUCCESS_SET_PARAM = '{"MsgType": "iniButton", "Content": "ParamSuccess"}';
+    /**
+     * 发送给websocket消息格式
+     * @var string
+     */
+    private static $sendWebTpl = '{MsgType:Trans,ButtonId:%d,Content:%s}';
+    /**
+     * 发送给APP消息格式
+     * @var string
+     */
+    private static $sendAppTpl = '{"MsgType": "Trans", "ClientId": "%s", "Content": %d}';
+	  /**
      * redis数据库链接
      * @return object
      */
@@ -44,7 +58,7 @@ class Event
         return $redis;
     }
     /**
-     * 判断MACID是否合法
+     * 过滤macid
      * @param  string  $mecid
      * @return boolean
      */
@@ -67,7 +81,7 @@ class Event
 		// clientid不存在
 		if($result === false){
 			// 新增客户端
-			$connectHC->query("INSERT INTO `WEBHC` ( `macid`,`clientid`, `param`) VALUES ( '$mac_id', '$client_id', '1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30')");
+			$connectHC->query("INSERT INTO `WEBHC` (`macid`,`clientid`) VALUES ('$mac_id', '$client_id')");
 			// 连接标记
 			self::$redisConnection->set($client_id, self::CONNECTION_STATE);
 			// 连接成功
@@ -102,14 +116,39 @@ class Event
 		}
 	}
 
+  public static function transToMessage($message)
+  {
+    $clientid = $message['ClientId'];
+    if(!Gateway::isOnline($clientid))
+    {
+      return false;
+    }
+    switch ($message['Content']) {
+      // 发送成功
+      case '001':
+        $sendMsg = sprintf(self::$sendWebTpl, $message['ButtonId'], '001');
+        Gateway::sendToClient($clientid, $sendMsg);
+        break;
+
+      // APP与蓝牙设备断开
+      case '102':
+        $sendMsg = sprintf(self::$sendWebTpl, $message['ButtonId'], '102');
+        Gateway::sendToClient($clientid, $sendMsg);
+        break;
+      
+      default:
+        # code...
+        break;
+    }
+  }
+
 	/**
 	 * 当客户端连接时触发
 	 * @param  int
 	 * @return void
 	 */
     public static function onConnect($client_id)
-    {       
-    	var_dump($client_id);
+    {
     	if(!isset(self::$redisConnection))
     	{
     		self::$redisConnection = self::connectRedis();
@@ -124,60 +163,93 @@ class Event
 	 */
    public static function onMessage($client_id, $message)
    {
+   		// 数据库实例
+      $connectHC = Db::instance('ConnectHC');
+
+   		// websocket数据
    		if($_SERVER['GATEWAY_PORT'] === 4404)
    		{
-   			var_dump($client_id);
-   			Gateway::sendToCurrentClient($message);
-   			return;
+   			$webdata = json_decode($message, true);
+   			$macid = $webdata['MacId'];
+   			$content = $webdata['Content'];
+   			$appclientid = $connectHC->single("SELECT clientid FROM `WEBHC` WHERE macid='$macid'");
+        if(!$appclientid || !Gateway::isOnline($appclientid))
+        {
+          $sendMsg = sprintf(self::$sendWebTpl, $content, '101');
+          Gateway::sendToClient($client_id, $sendMsg);
+          return;
+        }
+        $sendMsg = sprintf(self::$sendAppTpl, $client_id, $content);
+        Gateway::sendToClient($appclientid, $sendMsg);
+        return;
    		}
-   		/**
-      	* 得到客户端的IP和端口号
-      	* var_dump($_SERVER['REMOTE_ADDR'].':'.$_SERVER['REMOTE_PORT']);
-      	*/
+      // APP数据
+      $appdata = $message;
+      var_dump($appdata);
+      switch ($appdata['MsgType']) {
+        // 心跳包
+        case 'HeartPacket':
+          Gateway::sendToCurrentClient(1);
+          break;
 
- 		// 数据库实例
- 		$connectHC = Db::instance('ConnectHC');
+        // 注册
+        case 'Register':
+          if(!self::$redisConnection->get($client_id))
+          {
+            // 过滤MACID
+            $macid = $appdata['Content'];
+            if(self::isMacId($macid)){
+              self::connectionMacId($client_id, $macid);
+              return;
+            }
+            Gateway::sendToCurrentClient('fail');
+          }
+          break;
 
- 		// 接收到心跳包
- 		if(!is_array($message))
- 		{
- 			// 回复心跳包
-      		Gateway::sendToCurrentClient(1);
- 		}
- 		// 判断是否登录过
-      	else if(null === self::$redisConnection->get($client_id)){
-      		// macid是有效id
-      		if(self::isMacId($message['macid'])){
-      			self::connectionMacId($client_id, $message['macid']);
-      			return;
-      		}
-      		Gateway::sendToCurrentClient('fail');
-		}
-		else
-		{
-			Gateway::sendToCurrentClient(1);
-				// 更新蓝牙连接标志
-				if(isset($message['sign'])){
-					$sign = $message['sign'];
-					$data = $connectHC->query("UPDATE `WEBHC` SET `sign` = $sign WHERE clientid='$client_id'");
-					Gateway::sendToCurrentClient(self::SUCCESS_SET_SIGN);
-					return;
-				}
-				// 更新CLIENTID
-				if(isset($message['macid']) && self::isMacId($message['macid'])){
-					self::connectionMacId($client_id, $message['macid']);
-					return;
-				}
-				// 更新APP键名
-				$param = $connectHC->row("SELECT `param` FROM `WEBHC` WHERE clientid='$client_id'");
-				$parambefore = explode('/', $param['param']);
-				foreach ($message as $key => $value) {
-					$parambefore[$key-1] = $value;
-				}
-				$paramafter = implode('/', $parambefore);
-				$connectHC->query("UPDATE `WEBHC` SET `param` = '$paramafter' WHERE clientid='$client_id'");
+        // 蓝牙连接标志
+        case 'BlueSign':
+          $sign = $appdata['Content'];
+          $row = $connectHC->query("UPDATE `WEBHC` SET `sign` = $sign WHERE clientid='$client_id'");
+          if($row !== false)
+          {
+            Gateway::sendToCurrentClient(self::SUCCESS_SET_SIGN);
+            return;
+          }
+          Gateway::sendToCurrentClient('fail');
+          break;
 
-		}
+        case 'iniButton':
+          var_dump($appdata['Content']);
+          $param = $appdata['Content'];
+          $row = $connectHC->query("UPDATE `WEBHC` SET `param` = '$param' WHERE clientid='$client_id'");
+          if($row !== false)
+          {
+            Gateway::sendToCurrentClient(self::SUCCESS_SET_PARAM);
+            return;
+          }
+          Gateway::sendToCurrentClient('fail');
+          break;
+        // 修改按键值
+        case 'altButton':
+          $altkey = substr($appdata['Content'], 0, 1);
+          $altparam = substr($appdata['Content'], 2);
+          $dbparam = $connectHC->single("SELECT `param` FROM `WEBHC` WHERE clientid='$client_id'");
+          $parambefore = explode('],[', substr(substr($dbparam, 1), 0, -1));
+          $parambefore[$altkey-1] = $altparam;
+          $paramafter = '['.implode('],[', $parambefore).']';
+          $connectHC->query("UPDATE `WEBHC` SET `param` = '$paramafter' WHERE clientid='$client_id'");
+          break;
+
+        // 传输
+        case 'Trans':
+          self::transToMessage($message);
+          break;
+
+        default:
+          # code...
+          break;
+      }
+      return;
     }
    
    
@@ -186,19 +258,17 @@ class Event
      * @param  int
      * @return void
      */
-   public static function onClose($client_id)
-   {
+    public static function onClose($client_id)
+    {
        
     	// websocket客户端断开连接
-       	if($_SERVER['GATEWAY_PORT'] === 4404)
+      if($_SERVER['GATEWAY_PORT'] === 4404)
    		{
-   			var_dump($client_id."unconnection");
    			return;
    		}
        	$connectHC = Db::instance('ConnectHC');
        	// 清除记录
        	$connectHC->query("DELETE FROM `WEBHC` WHERE clientid='$client_id'");
        	self::$redisConnection->del($client_id);
-   }
-
+    }
 }
